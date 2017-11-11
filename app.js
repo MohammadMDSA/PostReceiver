@@ -34,12 +34,29 @@ bot.dialog('root', [
 		session.sendTyping();
 		// Prompts.attachment(session, msg);
 		Prompts.PostPrompt(session, msg);
-	},(session, results) => {
+	},
+	(session, results) => {
+		cm = { text: results.response.text, attachments: results.response.attachments };
+		session.dialogData.cm = cm;
+		session.send('مطمئنی؟؟');
+		let msg = new Message(session)
+			.attachments(cm.text)
+			.text(cm.text);
+			Prompts.choice(session, msg, ['آره، مطمئنم', 'نه!!!'], {listStyle: 3});
+	},
+	(session) => {
 		session.sendTyping();
-		db.insert('pendingMessages', { message: results }, () => {
-			session.send('ببینم جی میشه...');
-			Prompts.choice(session, 'باز میخوای بفرستی؟', ['آره!', 'نه!'], { listStyle: 3, retryPrompt: 'والا نفهمیدم چی میگی... میخوای باز پست بدی؟' });
-		});
+		db.insert(
+			'pendingMessages',
+			{
+				text: results.response.text,
+				attachments: results.response.attachments
+			},
+			() => {
+				session.send('ببینم جی میشه...');
+				Prompts.choice(session, 'باز میخوای بفرستی؟', ['آره!', 'نه!'], { listStyle: 3, retryPrompt: 'والا نفهمیدم چی میگی... میخوای باز پست بدی؟' });
+			}
+		);
 	},
 	(session, results) => {
 		if (results.response.entity === 'آره!')
@@ -49,11 +66,16 @@ bot.dialog('root', [
 	}
 ]);
 
+// Custom prompt
 let _postPrompt = new builder.Prompt({ defaultRetryPrompt: 'والا نفهمیدم چی میگی... میخوای باز پست بدی؟' })
 	.onRecognize((context, callback) => {
 		callback(null, 1.0, context.message);
 	});
+
+// Registering custom prompt dialog
 bot.dialog('PostPrompt', _postPrompt);
+
+// Registering custom prompt
 builder.Prompts.PostPrompt = (session, prompt, options) => {
 	let args = options || {};
 	args.prompt = prompt || options.prompt;
