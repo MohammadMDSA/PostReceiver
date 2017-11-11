@@ -36,10 +36,12 @@ bot.dialog('root', [
 		Prompts.PostPrompt(session, msg);
 	},
 	(session, results) => {
+		session.send({results});
 		results.response.attachments.forEach((item) => {
 			if(!item.name)
-				item.name = '';
+				item.name = ' ';
 		});
+		session.send({results});
 		cm = { text: results.response.text, attachments: results.response.attachments };
 		session.dialogData.cm = cm;
 		let msg = {
