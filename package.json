@@ -18,6 +18,8 @@
   "homepage": "https://github.com/MohammadMDSA/PostReceiverBot#readme",
   "dependencies": {
     "botbuilder": "^3.11.0",
+    "dotenv-extended": "^2.0.1",
+    "mongodb": "^2.2.33",
     "restify": "^6.3.2"
   }
 }
