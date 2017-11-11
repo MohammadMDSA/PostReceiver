@@ -36,6 +36,10 @@ bot.dialog('root', [
 		Prompts.PostPrompt(session, msg);
 	},
 	(session, results) => {
+		results.response.attachments.forEach((item) => {
+			if(!item.name)
+				item.name = '';
+		});
 		cm = { text: results.response.text, attachments: results.response.attachments };
 		session.dialogData.cm = cm;
 		let msg = {
@@ -43,7 +47,7 @@ bot.dialog('root', [
 			attachments: cm.attachments
 		}
 		session.send(msg);
-		Prompts.choice(session, 'مطمئنی؟؟', ['آره، مطمئنم', 'نه!!!'], {listStyle: 3});
+		Prompts.choice(session, 'مطمئنی؟؟', ['آره، مطمئنم', 'نه!!!'], {listStyle: 3, retryPrompt: 'درست بگو ببینم چی میگی... نفهمیدم'});
 		// session.send(msg);
 	},
 	(session, results) => {
