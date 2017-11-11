@@ -38,25 +38,32 @@ bot.dialog('root', [
 	(session, results) => {
 		cm = { text: results.response.text, attachments: results.response.attachments };
 		session.dialogData.cm = cm;
-		session.send('مطمئنی؟؟');
-		let msg = new Message(session)
-			.attachments(cm.text)
-			.text(cm.text);
-			Prompts.choice(session, msg, ['آره، مطمئنم', 'نه!!!'], {listStyle: 3});
+		let msg = {
+			text: cm.text,
+			attachments: cm.attachments
+		}
+		session.send(msg);
+		Prompts.choice(session, 'مطمئنی؟؟', ['آره، مطمئنم', 'نه!!!'], {listStyle: 3});
+		// session.send(msg);
 	},
-	(session) => {
+	(session, results) => {
 		session.sendTyping();
-		db.insert(
-			'pendingMessages',
-			{
-				text: results.response.text,
-				attachments: results.response.attachments
-			},
-			() => {
-				session.send('ببینم جی میشه...');
-				Prompts.choice(session, 'باز میخوای بفرستی؟', ['آره!', 'نه!'], { listStyle: 3, retryPrompt: 'والا نفهمیدم چی میگی... میخوای باز پست بدی؟' });
-			}
-		);
+		session.send({results});
+		if(results.response.entity === 'آره، مطمئنم')
+			db.insert(
+				'pendingMessages',
+				{
+					text: session.dialogData.cm.text,
+					attachments: session.dialogData.cm.attachments
+				},
+				() => {
+					session.dialogData.cm = {};
+					session.send('ببینم جی میشه...');
+					Prompts.choice(session, 'باز میخوای بفرستی؟', ['آره!', 'نه!'], { listStyle: 3, retryPrompt: 'والا نفهمیدم چی میگی... میخوای باز پست بدی؟' });
+				}
+			);
+		else
+			Prompts.choice(session, 'باز میخوای بفرستی؟', ['آره!', 'نه!'], { listStyle: 3, retryPrompt: 'والا نفهمیدم چی میگی... میخوای باز پست بدی؟' });
 	},
 	(session, results) => {
 		if (results.response.entity === 'آره!')
@@ -81,3 +88,10 @@ builder.Prompts.PostPrompt = (session, prompt, options) => {
 	args.prompt = prompt || options.prompt;
 	session.beginDialog('PostPrompt', args);
 }
+
+bot.dialog('end', (session) => {
+	session.endConversation('The end');
+})
+	.triggerAction({
+		matches: /^end$/i
+	});
