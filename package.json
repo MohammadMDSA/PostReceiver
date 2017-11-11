@@ -1,0 +1,23 @@
+{
+  "name": "postreceiverbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MohammadMDSA/PostReceiverBot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MohammadMDSA/PostReceiverBot/issues"
+  },
+  "homepage": "https://github.com/MohammadMDSA/PostReceiverBot#readme",
+  "dependencies": {
+    "botbuilder": "^3.11.0",
+    "restify": "^6.3.2"
+  }
+}
