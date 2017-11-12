@@ -36,13 +36,17 @@ bot.dialog('root', [
 		Prompts.PostPrompt(session, msg);
 	},
 	(session, results) => {
-		session.send({results});
 		results.response.attachments.forEach((item) => {
 			if(!item.name)
 				item.name = ' ';
+			if(results.response.sourceEvent && results.response.sourceEvent.message && results.response.sourceEvent.message.caption)
+				item.name = results.response.sourceEvent.message.caption;
 		});
 		session.send({results});
-		cm = { text: results.response.text, attachments: results.response.attachments };
+		cm = {
+			text: results.response.text,
+			attachments: results.response.attachments
+		};
 		session.dialogData.cm = cm;
 		let msg = {
 			text: cm.text,
