@@ -71,4 +71,24 @@ module.exports = class DB {
 			});
 		});
 	}
+	async deleteDocument(collName, condition, callback = () => { }) {
+		await MongoClient.connect(Address, (err, db) => {
+			if (err) throw err;
+			db.collection(collName).deleteOne(condition, (err) => {
+				if(err) throw err;
+				db.close();
+				callback();
+			});
+		});
+	}
+	async deleteManyDocuments(collName, condition, callback = () => { }) {
+		await MongoClient.connect(Address, (err, db) => {
+			if (err) throw err;
+			db.collection(collName).deleteMany(condition, (err) => {
+				if(err) throw err;
+				db.close();
+				callback();
+			});
+		});
+	}
 };
