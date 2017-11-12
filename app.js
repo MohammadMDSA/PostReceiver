@@ -37,37 +37,43 @@ bot.dialog('root', [
 	},
 	(session, results) => {
 		results.response.attachments.forEach((item) => {
-			if(!item.name)
+			if (!item.name)
 				item.name = ' ';
-			if(results.response.sourceEvent && results.response.sourceEvent.message && results.response.sourceEvent.message.caption)
+			if (results.response.sourceEvent && results.response.sourceEvent.message && results.response.sourceEvent.message.caption)
 				item.name = results.response.sourceEvent.message.caption;
 		});
-		session.send({results});
-		cm = {
+		// session.send({results});
+		// db.insert('pendingMessages', results.response);
+		let cm = {
 			text: results.response.text,
 			attachments: results.response.attachments
 		};
+		session.dialogData.sender = results.response.sourceEvent.message.from;
 		session.dialogData.cm = cm;
 		let msg = {
 			text: cm.text,
 			attachments: cm.attachments
 		}
 		session.send(msg);
-		Prompts.choice(session, 'مطمئنی؟؟', ['آره، مطمئنم', 'نه!!!'], {listStyle: 3, retryPrompt: 'درست بگو ببینم چی میگی... نفهمیدم'});
+		Prompts.choice(session, 'مطمئنی؟؟', ['آره، مطمئنم', 'نه!!!'], { listStyle: 3, retryPrompt: 'درست بگو ببینم چی میگی... نفهمیدم' });
 		// session.send(msg);
 	},
 	(session, results) => {
 		session.sendTyping();
-		session.send({results});
-		if(results.response.entity === 'آره، مطمئنم')
+		session.send({ results });
+		if (results.response.entity === 'آره، مطمئنم')
 			db.insert(
 				'pendingMessages',
 				{
-					text: session.dialogData.cm.text,
-					attachments: session.dialogData.cm.attachments
+					message: {
+						text: session.dialogData.cm.text,
+						attachments: session.dialogData.cm.attachments
+					},
+					sender: session.dialogData.sender
 				},
 				() => {
 					session.dialogData.cm = {};
+					session.dialogData.sender = {};
 					session.send('ببینم جی میشه...');
 					Prompts.choice(session, 'باز میخوای بفرستی؟', ['آره!', 'نه!'], { listStyle: 3, retryPrompt: 'والا نفهمیدم چی میگی... میخوای باز پست بدی؟' });
 				}
