@@ -76,7 +76,7 @@ bot.dialog('root', [
 				() => {
 					session.dialogData.cm = {};
 					session.dialogData.sender = {};
-					session.send('ببینم جی میشه...');
+					session.send('ببینم چی میشه...');
 					Prompts.choice(session, 'باز میخوای بفرستی؟', ['آره!', 'نه!'], { listStyle: 3, retryPrompt: 'والا نفهمیدم چی میگی... میخوای باز پست بدی؟' });
 				}
 			);
