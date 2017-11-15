@@ -46,13 +46,15 @@ bot.dialog('root', [
 		// db.insert('pendingMessages', results.response);
 		let cm = {
 			text: results.response.text,
+			textFormat: 'plain',
 			attachments: results.response.attachments
 		};
 		session.dialogData.sender = results.response.sourceEvent.message.from;
 		session.dialogData.cm = cm;
 		let msg = {
 			text: cm.text,
-			attachments: cm.attachments
+			attachments: cm.attachments,
+			textFormat: 'plain'
 		}
 		session.send(msg);
 		Prompts.choice(session, 'مطمئنی؟؟', ['آره، مطمئنم', 'نه!!!'], { listStyle: 3, retryPrompt: 'درست بگو ببینم چی میگی... نفهمیدم' });
@@ -60,14 +62,14 @@ bot.dialog('root', [
 	},
 	(session, results) => {
 		session.sendTyping();
-		session.send({ results });
 		if (results.response.entity === 'آره، مطمئنم')
 			db.insert(
 				'pendingMessages',
 				{
 					message: {
 						text: session.dialogData.cm.text,
-						attachments: session.dialogData.cm.attachments
+						attachments: session.dialogData.cm.attachments,
+						textFormat: 'plain'
 					},
 					sender: session.dialogData.sender
 				},
