@@ -71,10 +71,10 @@ bot.dialog('root', [
 					message: {
 						text: session.dialogData.cm.text,
 						attachments: session.dialogData.cm.attachments,
-						textFormat: 'plain',
-						id: count
+						textFormat: 'plain'
 					},
-					sender: session.dialogData.sender
+					sender: session.dialogData.sender,
+					id: count
 				},
 				() => {
 					count++;
