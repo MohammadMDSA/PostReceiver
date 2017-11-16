@@ -64,7 +64,7 @@ bot.dialog('root', [
 		session.sendTyping();
 		if (results.response.entity === 'آره، مطمئنم')
 			db.insert(
-				'pendingMessages',
+				'userMessages',
 				{
 					message: {
 						text: session.dialogData.cm.text,
