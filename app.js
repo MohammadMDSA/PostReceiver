@@ -18,6 +18,8 @@ let connector = new ChatConnector({
 });
 server.post('/api/messages', connector.listen());
 
+let count = 0;
+
 let bot = new UniversalBot(connector, (session) => {
 	session.replaceDialog('root', { isFirst: true });
 });
@@ -69,11 +71,13 @@ bot.dialog('root', [
 					message: {
 						text: session.dialogData.cm.text,
 						attachments: session.dialogData.cm.attachments,
-						textFormat: 'plain'
+						textFormat: 'plain',
+						id: count
 					},
 					sender: session.dialogData.sender
 				},
 				() => {
+					count++;
 					session.dialogData.cm = {};
 					session.dialogData.sender = {};
 					session.send('ببینم چی میشه...');
