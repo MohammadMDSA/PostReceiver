@@ -74,7 +74,7 @@ bot.dialog('root', [
 						textFormat: 'plain'
 					},
 					sender: session.dialogData.sender,
-					id: count
+					msgId: count
 				},
 				() => {
 					count++;
