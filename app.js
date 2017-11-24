@@ -27,7 +27,14 @@ let bot = new UniversalBot(connector, (session) => {
 bot.dialog('root', [
 	(session, args) => {
 		let msg = new Message(session)
-			.textFormat('plain');
+			.textFormat('plain')
+			.suggestedActions(
+				builder.SuggestedActions.create(
+					session,
+					[],
+					'User'
+				)
+			);
 		if (args && args.isFirst)
 			msg.text('سلام...\nپیام بده');
 		else
@@ -59,11 +66,55 @@ bot.dialog('root', [
 			textFormat: 'plain'
 		}
 		session.send(msg);
-		Prompts.choice(session, 'مطمئنی؟؟', ['آره، مطمئنم', 'نه!!!'], { listStyle: 3, retryPrompt: 'درست بگو ببینم چی میگی... نفهمیدم' });
+		msg = new Message(session)
+			.text('مطمئنی؟؟')
+			.suggestedActions(
+				builder.SuggestedActions.create(
+					session, [
+						builder.CardAction.postBack(session, 'آره، مطمئنم', 'آره، مطمئنم'),
+						builder.CardAction.postBack(session, 'نه!!!', 'نه!!!')
+					],
+					'User'
+				)
+			);
+		let reMsg = new Message(session)
+		.text('درست بگو ببینم چی میگی... نفهمیدم')
+		.suggestedActions(
+			builder.SuggestedActions.create(
+				session, [
+					builder.CardAction.postBack(session, 'آره، مطمئنم', 'آره، مطمئنم'),
+					builder.CardAction.postBack(session, 'نه!!!', 'نه!!!')
+				],
+				'User'
+			)
+		);
+		Prompts.choice(session, msg, ['آره، مطمئنم', 'نه!!!'], { listStyle: 3, retryPrompt: reMsg });
 		// session.send(msg);
 	},
 	(session, results) => {
 		session.sendTyping();
+		let msg = new Message(session)
+		.text('باز میخوای بفرستی؟')
+		.suggestedActions(
+			builder.SuggestedActions.create(
+				session, [
+					builder.CardAction.postBack(session, 'آره!', 'آره!'),
+					builder.CardAction.postBack(session, 'نه!', 'نه!')
+				],
+				'User'
+			)
+		);
+		let reMsg = new Message(session)
+		.text('والا نفهمیدم چی میگی... میخوای باز پست بدی؟')
+		.suggestedActions(
+			builder.SuggestedActions.create(
+				session, [
+					builder.CardAction.postBack(session, 'آره!', 'آره!'),
+					builder.CardAction.postBack(session, 'نه!', 'نه!')
+				],
+				'User'
+			)
+		);
 		if (results.response.entity === 'آره، مطمئنم')
 			db.insert(
 				'userMessages',
@@ -81,19 +132,38 @@ bot.dialog('root', [
 					session.dialogData.cm = {};
 					session.dialogData.sender = {};
 					session.send('ببینم چی میشه...');
-					Prompts.choice(session, 'باز میخوای بفرستی؟', ['آره!', 'نه!'], { listStyle: 3, retryPrompt: 'والا نفهمیدم چی میگی... میخوای باز پست بدی؟' });
+					Prompts.choice(session, msg, ['آره!', 'نه!'], { listStyle: 3, retryPrompt: reMsg });
 				}
 			);
-		else
-			Prompts.choice(session, 'باز میخوای بفرستی؟', ['آره!', 'نه!'], { listStyle: 3, retryPrompt: 'والا نفهمیدم چی میگی... میخوای باز پست بدی؟' });
+		else {
+			
+			Prompts.choice(session, msg, ['آره!', 'نه!'], { listStyle: 3, retryPrompt: reMsg });
+		}
 	},
 	(session, results) => {
 		if (results.response.entity === 'آره!')
 			session.replaceDialog('root', { isFirst: false })
-		else
-			session.endConversation('پس به سلامت...');
+		else {
+			let msg = new Message(session)
+				.text('پس به سلامت...')
+				.suggestedActions(
+					builder.SuggestedActions.create(
+						session,
+						[],
+						'User'
+					)
+				);
+			session.endConversation(msg);
+		}
 	}
-]);
+])
+	.triggerAction({
+		matches: /^(\/start)|(\/restart)$/i,
+		onSelectAction: (session) => {
+			session.endConversation();
+			session.replaceDialog('root', { isFirst: true });
+		}
+	});
 
 // Custom prompt
 let _postPrompt = new builder.Prompt({ defaultRetryPrompt: 'والا نفهمیدم چی میگی... میخوای باز پست بدی؟' })
@@ -110,10 +180,3 @@ builder.Prompts.PostPrompt = (session, prompt, options) => {
 	args.prompt = prompt || options.prompt;
 	session.beginDialog('PostPrompt', args);
 }
-
-bot.dialog('end', (session) => {
-	session.endConversation('The end');
-})
-	.triggerAction({
-		matches: /^end$/i
-	});
