@@ -4,8 +4,18 @@ const builder = require('botbuilder');
 const restify = require('restify');
 const { Prompts, UniversalBot, ChatConnector, Message } = builder;
 const Mongo = require('./MongoInterface');
+const fs = require('fs');
+const https = require('https');
 
 let db = new Mongo();
+
+const httpsKey = fs.readFileSync('./encryption/PostReceiverBot.key');
+const httpsCert = fs.readFileSync('./encryption/PostReceiverBot.crt');
+
+let httpsOptions = {
+	key: httpsKey,
+	cert: httpsCert
+}
 
 const server = restify.createServer();
 server.listen(process.env.PORT, () => {
@@ -16,6 +26,9 @@ let connector = new ChatConnector({
 	appId: process.env.MICROSOFT_APP_ID,
 	appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
+
+let httpsServer = https.createServer(httpsOptions, connector.listen()).listen(process.env.HTTPS_PORT);
+
 server.post('/api/messages', connector.listen());
 
 let count = 0;
