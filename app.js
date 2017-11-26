@@ -63,6 +63,8 @@ bot.dialog('root', [
 				item.name = ' ';
 			if (results.response.sourceEvent && results.response.sourceEvent.message && results.response.sourceEvent.message.caption)
 				item.name = results.response.sourceEvent.message.caption;
+			else
+				item.name = ' ';
 		});
 		// session.send({results});
 		// db.insert('pendingMessages', results.response);
